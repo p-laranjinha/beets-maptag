@@ -36,11 +36,11 @@
 
         LD_LIBRARY_PATH = "${pkgs.lib.makeLibraryPath systemPackages}";
 
-        shellHook = ''
-        '';
-
         postShellHook = ''
           unset SOURCE_DATE_EPOCH
+
+          echo "Run 'python setup.py install' to install the plugin."
+          echo "Run 'python -m beets -p maptag' to try the plugin."
         '';
       };
     };
