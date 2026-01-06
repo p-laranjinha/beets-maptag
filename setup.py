@@ -1,6 +1,6 @@
 import setuptools
 
-# Inspired by:
+# Mostly taken from:
 # https://github.com/adammillerio/beets-copyartifacts
 
 with open("README.md", "r") as fh:
@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="beets-maptag",
-    version="0.0.0",
+    version="0.0.1",
     description="beets plugin to help dynamically tag any database value",
     long_description=long_description,
     long_description_content_type="text/markdown",

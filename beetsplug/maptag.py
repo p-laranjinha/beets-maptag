@@ -7,6 +7,7 @@ from mediafile import MP3DescStorageStyle, MediaField, MediaFile, StorageStyle
 class MapTagPlugin(BeetsPlugin):
     def commands(self):
         command = Subcommand("maptag", help="map metadata fields to file tags")
+        command.parser.usage = "beet maptag [options] query"
         command.parser.add_option(
             "-i",
             "--input",
@@ -18,14 +19,14 @@ class MapTagPlugin(BeetsPlugin):
             "-o",
             "--output",
             action="append",
-            help="the file tags to map to",
+            help="the file tag to map to",
             metavar="FILE_TAG",
         )
         command.parser.add_option(
             "-s",
             "--skip",
             action="store_true",
-            help="skip any track without all the defined metadata fields (if not set, the fields that exist are applied)",
+            help="skip any track without all the defined metadata fields (if not set, the fields that do exist are applied)",
         )
         command.parser.add_option(
             "-q",
