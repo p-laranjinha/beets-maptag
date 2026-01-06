@@ -7,10 +7,9 @@ Usage: beet maptag [options] query
 
 Options:
   -h, --help            show this help message and exit
-  -i METADATA_FIELD, --input=METADATA_FIELD
-                        the metadata field to map
-  -o FILE_TAG, --output=FILE_TAG
-                        the file tag to map to
+  -i METADATA_FIELD FILE_TAG, --input=METADATA_FIELD FILE_TAG
+                        the metadata field to map from and the file tag it
+                        maps to
   -s, --skip            skip any track without all the defined metadata fields
                         (if not set, the fields that do exist are applied)
   -q, --quiet           no warning messages
@@ -21,11 +20,11 @@ Options:
 
 Example usage:
 ```
-# Map the metadata value 'year' to the tag 'date' on all tracks.
-beet maptag -i year -o date
+# Map the metadata value 'artist' to the tag 'albumartist' on all tracks
+beet maptag -i artist albumartist
 
 # Add the 'mood_happy' and 'mood_sad' tags to all tracks made by the artist 'mili'
-beet maptag -i mood_happy -o mood_happy -i mood_sad -o mood_sad artist:mili
+beet maptag -i mood_happy mood_happy -i mood_sad mood_sad artist:mili
 ```
 
 ## Installing
@@ -57,7 +56,7 @@ This is probably not the best way to do this, but its the way I do it (changing 
             (python-final: python-prev: {
               beets-maptag = python-prev.buildPythonPackage {
                 pname = "beets-maptag";
-                version = "0.0.1";
+                version = "0.0.2";
                 pyproject = true;
 
                 src = prev.fetchFromGitHub {

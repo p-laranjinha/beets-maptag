@@ -3,6 +3,9 @@ from beets.plugins import BeetsPlugin
 from beets.ui import Subcommand
 from mediafile import MP3DescStorageStyle, MediaField, MediaFile, StorageStyle
 
+METADATA_VALUE = 0
+FILE_TAG = 1
+
 
 class MapTagPlugin(BeetsPlugin):
     def commands(self):
@@ -12,15 +15,9 @@ class MapTagPlugin(BeetsPlugin):
             "-i",
             "--input",
             action="append",
-            help="the metadata field to map",
-            metavar="METADATA_FIELD",
-        )
-        command.parser.add_option(
-            "-o",
-            "--output",
-            action="append",
-            help="the file tag to map to",
-            metavar="FILE_TAG",
+            nargs=2,
+            help="the metadata field to map from and the file tag it maps to",
+            metavar="METADATA_FIELD FILE_TAG",
         )
         command.parser.add_option(
             "-s",
@@ -45,13 +42,6 @@ class MapTagPlugin(BeetsPlugin):
         return [command]
 
     def _command(self, lib, opts, args):
-        if not opts.input or not opts.output:
-            print("Both --input and --output are required.")
-            return
-        if len(opts.input) != len(opts.output):
-            print("An equal amount of --input and --output are required.")
-            return
-
         if opts.album:
             items: list[Item] = [album.items() for album in lib.albums(args)]
         else:
@@ -65,9 +55,11 @@ class MapTagPlugin(BeetsPlugin):
             skip_file = False
             for i in range(len(opts.input)):
 
-                if opts.input[i] not in item:
+                if opts.input[i][METADATA_VALUE] not in item:
                     if not opts.quiet and not opts.quiet_execution:
-                        print(f"'{opts.input[i]}' not found in {file.path}")
+                        print(
+                            f"'{opts.input[i][METADATA_VALUE]}' not found in {file.path}"
+                        )
                     if file.path not in missing_field_item_paths:
                         missing_field_item_paths.append(file.path)
                     if opts.skip:
@@ -76,16 +68,20 @@ class MapTagPlugin(BeetsPlugin):
                     else:
                         continue
 
-                if opts.output[i] not in file.fields():
+                if opts.input[i][FILE_TAG] not in file.fields():
                     field = MediaField(
-                        MP3DescStorageStyle(), StorageStyle(opts.output[i])
+                        MP3DescStorageStyle(), StorageStyle(opts.input[i][FILE_TAG])
                     )
-                    file.add_field(opts.output[i], field)
+                    file.add_field(opts.input[i][FILE_TAG], field)
 
                 try:
                     # This will fail if the format is wrong for already existing
                     #  tags, for example, setting 'year' to a string.
-                    setattr(file, opts.output[i], item[opts.input[i]])
+                    setattr(
+                        file,
+                        opts.input[i][FILE_TAG],
+                        item[opts.input[i][METADATA_VALUE]],
+                    )
                 except Exception as e:
                     exception = e
                     exception_item_path = item.path

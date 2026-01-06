@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="beets-maptag",
-    version="0.0.1",
+    version="0.0.2",
     description="beets plugin to help dynamically tag any database value",
     long_description=long_description,
     long_description_content_type="text/markdown",
