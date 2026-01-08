@@ -1,30 +1,36 @@
 # beets-maptag
 
-Beets plugin to map metadata fields to file tags.
+Beets plugin to map (copy the contents of) metadata fields to file tags.
 
 ```
 Usage: beet maptag [options] query
 
+Map (copy the contents of) metadata fields to file tags.
+
 Options:
   -h, --help            show this help message and exit
-  -i METADATA_FIELD FILE_TAG, --input=METADATA_FIELD FILE_TAG
-                        the metadata field to map from and the file tag it
-                        maps to
-  -s, --skip            skip any track without all the defined metadata fields
-                        (if not set, the fields that do exist are applied)
+  -m METADATA_FIELD FILE_TAG, --map=METADATA_FIELD FILE_TAG
+                        map a metadata field to a file tag
+  -s, --skip            skip mapping any track without all the defined
+                        metadata fields (if not set, the fields that do exist
+                        are applied)
+  -d FILE_TAG, --delete=FILE_TAG
+                        delete a file tag
   -q, --quiet           no warning messages
-  -e, --quiet_execution
-                        no warning messages during execution
+  --quiet_mapping       no warning messages during mapping
   -a, --album           match albums instead of tracks
 ```
 
 Example usage:
 ```
-# Map the metadata value 'artist' to the tag 'albumartist' on all tracks
-beet maptag -i artist albumartist
+# Map the metadata value 'year' to the tag 'date' on all tracks
+beet maptag -m year date
 
 # Add the 'mood_happy' and 'mood_sad' tags to all tracks made by the artist 'mili'
-beet maptag -i mood_happy mood_happy -i mood_sad mood_sad artist:mili
+beet maptag -m mood_happy mood_happy -m mood_sad mood_sad artist:mili
+
+# Delete the 'comment' and 'description' tags from all tracks
+beet maptag -d comment -d description
 ```
 
 ## Installing
