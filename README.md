@@ -56,7 +56,7 @@ This is probably not the best way to do this, but its the way I do it (changing 
             (python-final: python-prev: {
               beets-maptag = python-prev.buildPythonPackage {
                 pname = "beets-maptag";
-                version = "0.0.3";
+                version = "master";
                 pyproject = true;
 
                 src = prev.fetchFromGitHub {

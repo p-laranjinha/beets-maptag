@@ -66,6 +66,14 @@ class MapTagPlugin(BeetsPlugin):
             file = MediaFile(item.path)
             skip_file = False
             for i in range(len(opts.input)):
+                # Temporary field name that isn't already set here:
+                #  https://github.com/beetbox/mediafile/blob/1a41bda1b6863e9145f7d2e74da4a98cb0ffa6fd/mediafile/__init__.py#L373-L861
+                #  or by plugins that extend MediaFile.
+                # The name itself doesn't matter because we're not permanently
+                #  adding it to the database.
+                tmpfieldname = f"maptagtmp{i}"
+                while tmpfieldname in file.fields():
+                    tmpfieldname += "a"
 
                 if opts.input[i][METADATA_VALUE] not in item:
                     if not opts.quiet and not opts.quiet_execution:
@@ -80,36 +88,35 @@ class MapTagPlugin(BeetsPlugin):
                     else:
                         continue
 
-                if opts.input[i][FILE_TAG] not in file.fields():
-                    # https://github.com/beetbox/beets/blob/ad2ff1f97e686fa2c392355beb0cc16390dcf972/test/plugins/test_plugin_mediafield.py#L29-L41
-                    # Not sure what all these storage files are for, although I
-                    #  think they describe different formats.
-                    if isinstance(item[opts.input[i][METADATA_VALUE]], list):
-                        field = ListMediaField(
-                            MP3ListDescStorageStyle(opts.input[i][FILE_TAG]),
-                            MP4ListStorageStyle(
-                                f"----:com.apple.iTunes:{opts.input[i][FILE_TAG]}"
-                            ),
-                            ListStorageStyle(opts.input[i][FILE_TAG]),
-                            ASFStorageStyle(opts.input[i][FILE_TAG]),
-                        )
-                    else:
-                        field = MediaField(
-                            MP3DescStorageStyle(opts.input[i][FILE_TAG]),
-                            MP4StorageStyle(
-                                f"----:com.apple.iTunes:{opts.input[i][FILE_TAG]}"
-                            ),
-                            StorageStyle(opts.input[i][FILE_TAG]),
-                            ASFStorageStyle(opts.input[i][FILE_TAG]),
-                        )
-                    file.add_field(opts.input[i][FILE_TAG], field)
+                # https://github.com/beetbox/beets/blob/ad2ff1f97e686fa2c392355beb0cc16390dcf972/test/plugins/test_plugin_mediafield.py#L29-L41
+                # Not sure what all these storage files are for, although I
+                #  think they describe different formats.
+                if isinstance(item[opts.input[i][METADATA_VALUE]], list):
+                    field = ListMediaField(
+                        MP3ListDescStorageStyle(opts.input[i][FILE_TAG]),
+                        MP4ListStorageStyle(
+                            f"----:com.apple.iTunes:{opts.input[i][FILE_TAG]}"
+                        ),
+                        ListStorageStyle(opts.input[i][FILE_TAG]),
+                        ASFStorageStyle(opts.input[i][FILE_TAG]),
+                    )
+                else:
+                    field = MediaField(
+                        MP3DescStorageStyle(opts.input[i][FILE_TAG]),
+                        MP4StorageStyle(
+                            f"----:com.apple.iTunes:{opts.input[i][FILE_TAG]}"
+                        ),
+                        StorageStyle(opts.input[i][FILE_TAG]),
+                        ASFStorageStyle(opts.input[i][FILE_TAG]),
+                    )
+                file.add_field(tmpfieldname, field)
 
                 try:
                     # This will fail if the format is wrong for already existing
                     #  tags, for example, setting 'year' to a string.
                     setattr(
                         file,
-                        opts.input[i][FILE_TAG],
+                        tmpfieldname,
                         item[opts.input[i][METADATA_VALUE]],
                     )
                 except Exception as e:
