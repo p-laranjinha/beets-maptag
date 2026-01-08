@@ -1,7 +1,19 @@
 from beets.library import Item
 from beets.plugins import BeetsPlugin
 from beets.ui import Subcommand
-from mediafile import MP3DescStorageStyle, MediaField, MediaFile, StorageStyle
+import mediafile
+from mediafile import (
+    ASFStorageStyle,
+    ListMediaField,
+    MP3DescStorageStyle,
+    MP3ListDescStorageStyle,
+    MP4ListStorageStyle,
+    MP4StorageStyle,
+    MediaField,
+    MediaFile,
+    StorageStyle,
+    ListStorageStyle,
+)
 
 METADATA_VALUE = 0
 FILE_TAG = 1
@@ -69,9 +81,27 @@ class MapTagPlugin(BeetsPlugin):
                         continue
 
                 if opts.input[i][FILE_TAG] not in file.fields():
-                    field = MediaField(
-                        MP3DescStorageStyle(), StorageStyle(opts.input[i][FILE_TAG])
-                    )
+                    # https://github.com/beetbox/beets/blob/ad2ff1f97e686fa2c392355beb0cc16390dcf972/test/plugins/test_plugin_mediafield.py#L29-L41
+                    # Not sure what all these storage files are for, although I
+                    #  think they describe different formats.
+                    if isinstance(item[opts.input[i][METADATA_VALUE]], list):
+                        field = ListMediaField(
+                            MP3ListDescStorageStyle(opts.input[i][FILE_TAG]),
+                            MP4ListStorageStyle(
+                                f"----:com.apple.iTunes:{opts.input[i][FILE_TAG]}"
+                            ),
+                            ListStorageStyle(opts.input[i][FILE_TAG]),
+                            ASFStorageStyle(opts.input[i][FILE_TAG]),
+                        )
+                    else:
+                        field = MediaField(
+                            MP3DescStorageStyle(opts.input[i][FILE_TAG]),
+                            MP4StorageStyle(
+                                f"----:com.apple.iTunes:{opts.input[i][FILE_TAG]}"
+                            ),
+                            StorageStyle(opts.input[i][FILE_TAG]),
+                            ASFStorageStyle(opts.input[i][FILE_TAG]),
+                        )
                     file.add_field(opts.input[i][FILE_TAG], field)
 
                 try:
