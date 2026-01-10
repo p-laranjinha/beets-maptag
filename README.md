@@ -16,6 +16,8 @@ Options:
                         are applied)
   -d FILE_TAG, --delete=FILE_TAG
                         delete a file tag
+  --delete-field=METADATA_FIELD
+                        delete the file tags associated with a metadata field
   -q, --quiet           no warning messages
   --quiet_mapping       no warning messages during mapping
   -a, --album           match albums instead of tracks
@@ -31,6 +33,10 @@ beet maptag -m mood_happy mood_happy -m mood_sad mood_sad artist:mili
 
 # Delete the 'comment' and 'description' tags from all tracks
 beet maptag -d comment -d description
+
+# MP3 files are harder to generalize so to delete normal beets tags on MP3s use this
+# Delete all tags associated with the 'catalognums' metadata field
+beet maptage --delete-field catalognums
 ```
 
 ## Installing

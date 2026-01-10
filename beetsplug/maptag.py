@@ -1,7 +1,6 @@
 from beets.library import Item
 from beets.plugins import BeetsPlugin
 from beets.ui import Subcommand
-import mediafile
 from mediafile import (
     ASFStorageStyle,
     ListMediaField,
@@ -50,6 +49,12 @@ class MapTagPlugin(BeetsPlugin):
             metavar="FILE_TAG",
         )
         self.command.parser.add_option(
+            "--delete-field",
+            action="append",
+            help="delete the file tags associated with a metadata field",
+            metavar="METADATA_FIELD",
+        )
+        self.command.parser.add_option(
             "-q",
             "--quiet",
             action="store_true",
@@ -77,8 +82,9 @@ class MapTagPlugin(BeetsPlugin):
             file = MediaFile(item.path)
             skip_mapping = False
 
-            if not opts.map and not opts.delete:
+            if not opts.map and not opts.delete and not opts.delete_field:
                 self.command.parser.print_help()
+                return
 
             if opts.map:
                 for i in range(len(opts.map)):
@@ -127,6 +133,18 @@ class MapTagPlugin(BeetsPlugin):
                     file.add_field(tmpfieldname, field)
                     try:
                         delattr(file, tmpfieldname)
+                    except Exception as e:
+                        exception = e
+                        exception_item_path = item.path
+                        break
+                if exception != None:
+                    break
+                file.save()
+
+            if opts.delete_field:
+                for field in opts.delete_field:
+                    try:
+                        delattr(file, field)
                     except Exception as e:
                         exception = e
                         exception_item_path = item.path
